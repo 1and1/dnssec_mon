@@ -17,7 +17,7 @@ MYPATH="$(dirname $0)"
 ITODNS_LIBS="$MYPATH/../lib"
 MODULES_DIR="$ITODNS_LIBS/modules"
 
-CONFIG_TRY_LOAD "$MYPATH/itodns.conf"  /etc/itodns.conf ~/.itodns.conf
+CONFIG_TRY_LOAD "$MYPATH/../itodns.conf" /etc/itodns.conf ~/.itodns.conf
 
 LIBDIR_ADD "$ITODNS_LIBS"
 
@@ -31,7 +31,7 @@ INCLUDE "locations"
 INCLUDE "server_types"
 INCLUDE "dnssec"
 
-CONFIG_TRY_LOAD /etc/itodns.conf ~/.itodns.conf
+CONFIG_TRY_LOAD "$MYPATH/../itodns.conf" /etc/itodns.conf ~/.itodns.conf
 
 CHECK_PREREQS
 
