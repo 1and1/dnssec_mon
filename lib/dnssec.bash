@@ -65,12 +65,12 @@ VERIFY_SEC() {
 				then
 					LOG "Record not found - got NSEC3: $RECORD"
 				else
-					LOG "Record $SIG_TYPE $RECORD from $SIG_OWNER is valid from $SIG_FROM to $SIG_UNTIL - signed with algo $SIG_ALG"
+					DEBUG "Record $SIG_TYPE $RECORD from $SIG_OWNER is valid from $SIG_FROM to $SIG_UNTIL - signed with algo $SIG_ALG"
 					VERIFY_VALID_RANGE "$SIG_FROM" "$SIG_UNTIL"
 					VVR_EC="$?"   #Verif-Valid-Rance-Error-Code
 					case "$VVR_EC" in
 						0)
-							LOG "Signature timerange valid"
+							LOG "Signature timerange ($SIG_FROM < $SIG_UNTIL) valid"
 							;;
 						1)
 							LOG "Signature not yet valid"
