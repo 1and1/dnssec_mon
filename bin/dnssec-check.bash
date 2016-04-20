@@ -31,6 +31,49 @@ TEST_TYPES="SOA"
 CONFIG_TRY_LOAD "$MYPATH/../itodns.conf" /etc/itodns.conf ~/.itodns.conf
 CHECK_PREREQS
 
+MAIN(){
+	INCLUDE "dnssec"
+	CHECK_PREREQS
+
+	DEBUG "Would test Zones '$TEST_ZONES' for '$TEST_TYPES'"
+	ASSERT_NOTEMPTY "$TEST_ZONES" || FAIL 2 "need to specify zones to test"
+	ASSERT_NOTEMPTY "$TEST_TYPES"  || FAIL 2 "no RecordTypes to test"
+
+
+	ASSERT_NOTEMPTY "$ACTION" || FAIL 3 "Unspecified Action: WTF!"
+	case "$ACTION" in
+		check)
+			DEBUG "Checking Zones human-readable"
+				(
+				for RT in $TEST_TYPES
+					do
+						for Z in $TEST_ZONES
+							do
+								VERIFY_SEC "$RT" "$Z"
+							done
+					done
+				)
+			;;
+		parse)
+			DEBUG "Checking Zones machine-readable"
+				(
+				for RT in $TEST_TYPES
+					do
+						for Z in $TEST_ZONES
+							do
+								DIG +dnssec "$RT" "$Z" "@$DNSSEC_RECURSOR"
+							done
+					done
+				) | PARSE_RRSIGS_STREAM
+			;;
+		*)
+			FAIL 3 "Unknown Action $ACTION"
+			;;
+	esac
+	LOG "Done"
+}
+
+
 ACTION="check"
 RRSIG_GRACE_DAYS="0"
 NEXTTOKEN="ZONE"
@@ -49,13 +92,13 @@ while [[ -n "$1" ]]
 			-T)
 				DEBUG "Loading Typelist from file $1"
 				[[ -r "$1" ]] || ERROR "File $1 not readable"
-				TEST_TYPES="$(cat $1)"
+				TEST_TYPES="$(cat "$1")"
 				shift
 				;;
 			-T+)
 				DEBUG "Loading Typelist from file $1"
 				[[ -r "$1" ]] || ERROR "File $1 not readable"
-				TEST_TYPES="$TEST_TYPES $(cat $1)"
+				TEST_TYPES="$TEST_TYPES $(cat "$1")"
 				shift
 				;;
 			-z)
@@ -65,13 +108,13 @@ while [[ -n "$1" ]]
 			-Z)
 				DEBUG "Loading Zonelist from file $1"
 				[[ -r "$1" ]] || ERROR "File $1 not readable"
-				TEST_ZONES="$(cat $1)"
+				TEST_ZONES="$(cat "$1")"
 				shift
 				;;
 			-Z+)
 				DEBUG "Loading additional Zonelist from file $1"
 				[[ -r "$1" ]] || ERROR "File $1 not readable"
-				TEST_ZONES="$TEST_ZONES $(cat $1)"
+				TEST_ZONES="$TEST_ZONES $(cat "$1")"
 				shift
 				;;
 			-s)
@@ -107,56 +150,4 @@ while [[ -n "$1" ]]
 		esac
 	done
 
-INCLUDE "dnssec"
-CHECK_PREREQS
-
-
-DEBUG "Would test Zones '$TEST_ZONES' for '$TEST_TYPES'"
-ASSERT_NOTEMPTY "$TEST_ZONES" || FAIL 2 "need to specify zones to test"
-ASSERT_NOTEMPTY "$TEST_TYPES"  || FAIL 2 "no RecordTypes to test"
-
-
-ASSERT_NOTEMPTY "$ACTION" || FAIL 3 "Unspecified Action: WTF!"
-case "$ACTION" in
-	check)
-		DEBUG "Checking Zones human-readable"
-			(
-			for RT in $TEST_TYPES
-				do
-					for Z in $TEST_ZONES
-						do
-							VERIFY_SEC "$RT" "$Z"
-						done
-				done
-			)
-		;;
-	parse)
-		DEBUG "Checking Zones machine-readable"
-			(
-			for RT in $TEST_TYPES
-				do
-					for Z in $TEST_ZONES
-						do
-							DIG +dnssec "$RT" "$Z" "@$DNSSEC_RECURSOR"
-						done
-				done
-			) | PARSE_RRSIGS_STREAM
-		;;
-	*)
-		FAIL 3 "Unknown Action $ACTION"
-		;;
-esac
-
-exit
-
-(
-for RT in txt a aaaa soa ns
-	do
-		for Z in gmx.{com,net,de,at,ch} web.de mail.com ui-r.com
-			do
-				DIG +dnssec $RT $Z @$DNSSEC_RECURSOR
-			done
-	done
-) | PARSE_RRSIGS_STREAM
-
-LOG "Done"
+MAIN $*
