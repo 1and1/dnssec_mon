@@ -119,7 +119,7 @@ while [[ -n "$1" ]]
 			-d)
 				BASHLIB_DEBUG=TRUE
 				;;
-			-h)
+			'-?')
 				HELP
 				exit 0
 				;;
@@ -164,6 +164,10 @@ while [[ -n "$1" ]]
 				DEBUG "Setting Server $1"
 				DNSSEC_RECURSOR="$1"
 				shift
+				;;
+			-h)
+				DEBUG "Generating human-readable output"
+				ACTION="check"
 				;;
 			-m)
 				DEBUG "Generating machine-readable output"
