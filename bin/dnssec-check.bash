@@ -18,8 +18,9 @@ HELP() {
 $0 [OPTS] <ZONES>
 Options:
     -d           enable Debugging
-    -m           enable machine-parsable Output
-    -f <file>    specify additional configfile to read
+    -m           enable machine-parsable output
+    -w           warn-mode - only show warnings and only show seconds
+    -c <file>    specify additional configfile to read
     -s <server>  select Server for DNS-Requests
     -g <days>    specify the number of grace days to warn
                  before expiration
@@ -75,6 +76,7 @@ MAIN(){
 							done
 					done
 				)
+			LOG "Done"
 			;;
 		parse)
 			DEBUG "Checking Zones machine-readable"
@@ -88,11 +90,22 @@ MAIN(){
 					done
 				) | PARSE_RRSIGS_STREAM
 			;;
+		warn)
+			DEBUG "Checking Zones for warnings"
+				(
+				for RT in $TEST_TYPES
+					do
+						for Z in $TEST_ZONES
+							do
+								DIG +dnssec "$RT" "$Z" "@$DNSSEC_RECURSOR"
+							done
+					done
+				) | PARSE_RRSIGS_STREAM | GENERATE_WARNING
+			;;
 		*)
 			FAIL 3 "Unknown Action $ACTION"
 			;;
 	esac
-	LOG "Done"
 }
 
 ACTION="check"
@@ -110,7 +123,7 @@ while [[ -n "$1" ]]
 				HELP
 				exit 0
 				;;
-			-f)
+			-c)
 				DEBUG "Loading additional config $1"
 				CONFIG_LOAD "$1" || FAIL 7 "Could not load $1"
 				shift
@@ -155,6 +168,10 @@ while [[ -n "$1" ]]
 			-m)
 				DEBUG "Generating machine-readable output"
 				ACTION="parse"
+				;;
+			-w)
+				DEBUG "Generating warning-only output"
+				ACTION="warn"
 				;;
 			-g)
 				DEBUG "Defining Gracetime $1 days"
