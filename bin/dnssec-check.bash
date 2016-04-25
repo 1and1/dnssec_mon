@@ -73,6 +73,29 @@ MAIN(){
 	LOG "Done"
 }
 
+HELP() {
+	cat <<EOT
+$0 [OPTS] <ZONES>
+Options:
+    -d           enable Debugging
+    -m           enable machine-parsable Output
+    -f <file>   *specify additional configfile to read
+    -s <server>  select Server for DNS-Requests
+    -g <days>    specify the number of grace days to warn
+                 before expiration
+
+    -t {types}   specify that recordtypes are following
+    -z {zones}   specify that a list of zones are following
+
+    -T <file>    read the list of types from file
+    -Z <file>    read the list of zones from file
+    if -T or -Z is suffixed by a "+" sign, the contents of the
+    file will be added to the existing lists.
+
+[*] Option is yet to be implemented
+EOT
+}
+
 
 ACTION="check"
 RRSIG_GRACE_DAYS="0"
@@ -84,6 +107,15 @@ while [[ -n "$1" ]]
 		case "$ARG_" in
 			-d)
 				BASHLIB_DEBUG=TRUE
+				;;
+			-h)
+				HELP
+				exit 0
+				;;
+			-f)
+				DEBUG "Loading additional config $1"
+				CONFIG_LOAD "$1" || FAIL 7 "Could not load $1"
+				shift
 				;;
 			-t)
 				DEBUG "RecordTypes following"
