@@ -13,6 +13,28 @@ INCLUDE "config"
 INCLUDE "assert"
 INCLUDE "time"
 
+HELP() {
+	cat <<EOT
+$0 [OPTS] <ZONES>
+Options:
+    -d           enable Debugging
+    -m           enable machine-parsable Output
+    -f <file>    specify additional configfile to read
+    -s <server>  select Server for DNS-Requests
+    -g <days>    specify the number of grace days to warn
+                 before expiration
+
+    -t {types}   specify that recordtypes are following
+    -z {zones}   specify that a list of zones are following
+
+    -T <file>    read the list of types from file
+    -Z <file>    read the list of zones from file
+    if -T or -Z is suffixed by a "+" sign, the contents of the
+    file will be added to the existing lists.
+
+EOT
+}
+
 MYPATH="$(dirname "${BASH_SOURCE[0]}")"
 ITODNS_LIBS="$MYPATH/../lib"
 MODULES_DIR="$ITODNS_LIBS/modules"
@@ -72,30 +94,6 @@ MAIN(){
 	esac
 	LOG "Done"
 }
-
-HELP() {
-	cat <<EOT
-$0 [OPTS] <ZONES>
-Options:
-    -d           enable Debugging
-    -m           enable machine-parsable Output
-    -f <file>   *specify additional configfile to read
-    -s <server>  select Server for DNS-Requests
-    -g <days>    specify the number of grace days to warn
-                 before expiration
-
-    -t {types}   specify that recordtypes are following
-    -z {zones}   specify that a list of zones are following
-
-    -T <file>    read the list of types from file
-    -Z <file>    read the list of zones from file
-    if -T or -Z is suffixed by a "+" sign, the contents of the
-    file will be added to the existing lists.
-
-[*] Option is yet to be implemented
-EOT
-}
-
 
 ACTION="check"
 RRSIG_GRACE_DAYS="0"
