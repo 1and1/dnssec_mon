@@ -1,2 +1,2 @@
-Dependencies: Uses bashlib [https://git.1and1.org/jwalzer/bashlib]
+Dependencies: Uses bashlib [https://github.com/jwalzer/bashlib]
  
