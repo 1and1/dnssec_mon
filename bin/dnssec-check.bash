@@ -37,21 +37,17 @@ EOT
 }
 
 MYPATH="$(dirname "${BASH_SOURCE[0]}")"
-ITODNS_LIBS="$MYPATH/../lib"
-MODULES_DIR="$ITODNS_LIBS/modules"
-
-CONFIG_TRY_LOAD "$MYPATH/../itodns.conf" /etc/itodns.conf ~/.itodns.conf
-
-LIBDIR_ADD "$ITODNS_LIBS"
-
+DNSSEC_LIBS="$MYPATH/../lib"
+MODULES_DIR="$DNSSEC_LIBS/modules"
+LIBDIR_ADD "$DNSSEC_LIBS"
 
 TIMESTAMP="$(GET_TIMESTAMP)"
 
-
 TEST_ZONES=""
 TEST_TYPES="SOA"
+DNSSEC_RECURSOR="rec01.svc.1u1.it"
 
-CONFIG_TRY_LOAD "$MYPATH/../itodns.conf" /etc/itodns.conf ~/.itodns.conf
+CONFIG_TRY_LOAD "$MYPATH/../dnssec_mon.conf" /etc/dnssec_mon.conf ~/.dnssec_mon.conf
 CHECK_PREREQS
 
 MAIN(){
